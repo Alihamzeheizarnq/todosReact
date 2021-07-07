@@ -1,34 +1,27 @@
-import React , { useState } from 'react';
+import React, { useState, useReducer } from 'react';
 import Header from './Components/Header';
 import AddTodo from './Components/AddTodo';
 import SingleTodo from './Components/SingleTodo';
 import TodoContext from './Context/TodoContext';
+import TodoReducer from './Reducer/TodoReducer';
 
 function App() {
 
-  let [todos , setTodos] = useState({todos : []})
-  let add = (text) => {
+  let [done, setDone] = useState(false)
+  const [state, dispatch] = useReducer(TodoReducer, {
+    todos: []
+  })
 
-    setTodos(prevState => {
-      return {
-        todos : [
-             ...prevState.todos,
-        {key : Date.now() , name : text , done : false}
-        ]
-     
-    }
-    })
-
+  let states = {
+    dispatch,
   }
 
-  let state = {
-    todos,
-    add
-  }
-  
 
+
+  let countOnDone = state.todos.filter(item => item.done !== false);
+  let countDone = state.todos.filter(item => item.done === false);
   return (
-    <TodoContext.Provider value={state} >
+    <TodoContext.Provider value={states} >
       <div className="App">
         <Header />
         <main>
@@ -38,12 +31,15 @@ function App() {
               <div className="d-flex flex-column align-items-center ">
                 <nav className="col-6 mb-3">
                   <div className="nav nav-tabs" id="nav-tab" role="tablist">
-                    <a className="nav-item nav-link active font-weight-bold" id="nav-home-tab">undone <span className="badge badge-secondary">9</span></a>
-                    <a className="nav-item nav-link font-weight-bold" id="nav-profile-tab">done <span className="badge badge-success">9</span></a>
+                    <a onClick={() => setDone(false)} className={`nav-item nav-link font-weight-bold ${!done ? 'active' : ''}`} id="nav-home-tab">undone <span className="badge badge-secondary">{countDone.length}</span></a>
+                    <a onClick={() => setDone(true)} className={`nav-item nav-link font-weight-bold ${done ? 'active' : ''}`} id="nav-profile-tab">done <span className="badge badge-success"> {countOnDone.length}</span></a>
                   </div>
                 </nav>
-                {todos.todos.map(item => <SingleTodo key={item.ket} item={item} />)}
-                
+                {
+                  done ? state.todos.map(item => item.done ? <SingleTodo key={item.key} item={item} /> : '')
+                    : state.todos.map(item => !item.done ? <SingleTodo key={item.key} item={item} /> : '')
+
+                }
               </div>
 
             </div>

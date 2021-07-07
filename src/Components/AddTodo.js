@@ -6,7 +6,7 @@ function AddTodo() {
 
   let formHanler = (e) => {
     e.preventDefault();
-    Context.add(text);
+    Context.dispatch({ type: 'ADD_TODO', payload: { text } });
     setText('')
   }
   return (
